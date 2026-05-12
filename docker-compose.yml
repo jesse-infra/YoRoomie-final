@@ -1,16 +1,17 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: yoroomie-postgres
+  mysql:
+    image: mysql:8.0
+    container_name: yoroomie-mysql
     restart: always
     environment:
-      POSTGRES_DB: yoroomie_db
-      POSTGRES_USER: yoroomie_user
-      POSTGRES_PASSWORD: yoroomie_password
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: yoroomie_db
+      MYSQL_USER: yoroomie_user
+      MYSQL_PASSWORD: yoroomie_password
     ports:
-      - "5432:5432"
+      - "3307:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   backend:
@@ -21,14 +22,13 @@ services:
       - "3001:3000"
     environment:
       PORT: 3000
-      DB_HOST: postgres
-      DB_PORT: 5432
+      DB_HOST: mysql
+      DB_PORT: 3306
       DB_NAME: yoroomie_db
       DB_USER: yoroomie_user
       DB_PASSWORD: yoroomie_password
-      DB_SSL: "false"
     depends_on:
-      - postgres
+      - mysql
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -46,4 +46,4 @@ services:
       - /app/node_modules
 
 volumes:
-  postgres_data:
+  mysql_data:
